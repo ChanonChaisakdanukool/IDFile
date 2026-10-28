@@ -1,3 +1,4 @@
+# Legacy CocoaPods only. New consumers should use SPM; see SPM.md.
 platform :ios, '13.0'
 target 'YourApp' do
   use_frameworks!

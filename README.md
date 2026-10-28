@@ -20,26 +20,42 @@ npm test
 แก้ JSON แล้ว generate และ commit generated/ กับ dist/ ร่วมกัน ผู้ติดตั้ง Library ไม่ต้องรัน Generator
 รูปแบบ Array ของ string: ระบุชื่อ ID ครั้งเดียว ห้ามซ้ำ ใช้ lowerCamelCase ตัวอักษรอังกฤษและตัวเลข หลีกเลี่ยงคำสงวน ชื่อจริงใช้ pageName + elementPurpose + elementType ตามเอกสารเดิม ส่วน idBegin เป็นค่าเริ่มต้นที่กำหนด
 
-## iOS — CocoaPods Local
+## iOS — Swift Package Manager (SPM)
 
-ใน Podfile เปลี่ยนชื่อ target และ path ให้ตรงเครื่อง:
+Package.swift ที่ root ประกาศ Product และ Module ชื่อ SharedElementIds ใช้ไฟล์ใน generated/swift เท่านั้น ไม่ Compile Kotlin/Web และไม่ต้องใช้ Node.js ในโปรเจกต์ iOS
+รองรับ Swift tools 5.9 ขึ้นไป และ iOS 13 ขึ้นไป
 
-```ruby
-platform :ios, '13.0'
-target 'YourApp' do
-  use_frameworks!
-  pod 'SharedElementIds', :path => '/absolute/path/to/IDFile'
-end
-```
+### ติดตั้งจาก Git ใน Xcode
 
-รัน `pod install` ในโปรเจกต์แอป แล้วเปิด .xcworkspace
+1. Commit และ Push การเพิ่ม Package.swift ไป IDFile Repo ก่อน (Commit เก่ายังไม่มี SPM Manifest)
+2. Xcode → File → Add Package Dependencies
+3. ใส่ URL https://github.com/ChanonChaisakdanukool/IDFile.git
+4. ระหว่างพัฒนาเลือก Branch main หรือเลือก Commit ที่มี Package.swift เมื่อต้องการล็อกเวอร์ชัน หากใช้ Version Rule ต้องสร้างและ Push SemVer Tag ก่อน
+5. เพิ่ม Product SharedElementIds ให้ Target/Module ที่ Import จริง
 
 ```swift
 import SharedElementIds
 button.accessibilityIdentifier = ElementIds.idBegin
 ```
 
-iOS ขั้นต่ำ 13.0 เป็นค่าเริ่มต้นที่ปรับได้ Podspec ใช้ Git Repo จริงแล้ว การติดตั้งผ่าน Git ด้วย Tag 0.1.0 ต้อง Push โค้ดและสร้าง Tag นั้นก่อน
+### ใช้จาก Swift Package อื่น
+
+ใน Package.swift ของผู้ใช้ Library เพิ่ม Dependency แล้วผูก Product กับ Target ที่ต้องใช้:
+
+```swift
+// ภายใน dependencies ของ Package:
+.package(url: "https://github.com/ChanonChaisakdanukool/IDFile.git", branch: "main")
+// ภายใน dependencies ของ Target:
+.product(name: "SharedElementIds", package: "IDFile")
+```
+
+ก่อน release ควรล็อก Commit หรือ Version Tag ตามนโยบายทีม และเก็บ Package.resolved ที่เกี่ยวข้อง
+ถ้า Source อยู่ใน Module ย่อย ต้องประกาศ Dependency ที่ Module นั้นด้วย การเพิ่มให้ App Target อย่างเดียวไม่ได้ทำให้ทุก Module Import ได้
+
+### ย้ายจาก CocoaPods
+
+ถอด SharedElementIds จาก Podfile / Podspec ของผู้ใช้ที่เคยประกาศ แล้วอัปเดต Pods ก่อนเพิ่ม SPM ไม่ให้ Module เดียวกันเข้าผ่านสองช่องทางพร้อมกัน
+Podspec และ Podfile.example เดิมเก็บไว้สำหรับ Consumer ที่ยังไม่ย้ายเท่านั้น SPM เป็นช่องทางหลักใหม่ ไม่ต้อง pod install สำหรับการติดตั้ง SPM
 
 ## Android — Gradle / Maven Local Folder
 
@@ -105,7 +121,8 @@ ESM พร้อม JavaScript และ .d.ts สร้างจาก JSON โ
 - scripts/ids.mjs: Validate / Generate / Check
 - generated/: Swift, Kotlin, TypeScript
 - dist/: JavaScript และ .d.ts สำหรับ npm
-- SharedElementIds.podspec: CocoaPods
+- Package.swift: Swift Package Manager สำหรับ iOS
+- SharedElementIds.podspec: Legacy CocoaPods ระหว่างย้าย Consumer
 - android/: Gradle build และ Maven publishing แบบ local
 - examples/: ตัวอย่างแต่ละฝั่ง
 - test/: Generator และ package consistency checks
@@ -124,7 +141,7 @@ IDFile จะเป็น Git Repository แยกของตัวเอง �
 
 ```text
 ID Repository (element-ids.json)
-  ├─ CocoaPods → iOS App
+  ├─ Swift Package Manager → iOS App
   ├─ Gradle/Maven → Android App
   └─ npm → Web / Mini App และ Automation Repo
 ```
@@ -142,7 +159,7 @@ const targetId: ElementId = ElementIds.idBegin;
 
 Automation เป็นผู้รับ Library จึงไม่ต้องรัน Generator และไม่ต้องอ่านไฟล์จาก path ของ ID Repo ตอนรันทดสอบ ให้ layer สำหรับ Selector ของ Automation แปลง ID เป็น locator ตาม Platform จริง
 
-เมื่อมี Git Repo แล้ว สามารถติดตั้ง npm ผ่าน Git URL ที่เข้าถึงได้และล็อก Tag/Commit หรือเปลี่ยนไปใช้ Private npm Registry ตามที่ทีมเลือก CocoaPods ใช้ Git Tag ส่วน Android ต้อง Build และเผยแพร่ Maven artifact ก่อน (Git Repo อย่างเดียวไม่กลายเป็น Maven Repository อัตโนมัติ)
+เมื่อมี Git Repo แล้ว สามารถติดตั้ง npm ผ่าน Git URL ที่เข้าถึงได้และล็อก Tag/Commit หรือเปลี่ยนไปใช้ Private npm Registry ตามที่ทีมเลือก SPM ใช้ Git Branch/Commit/Version Tag ส่วน Android ต้อง Build และเผยแพร่ Maven artifact ก่อน (Git Repo อย่างเดียวไม่กลายเป็น Maven Repository อัตโนมัติ)
 
 แต่ละ Consumer ต้องล็อกเวอร์ชัน/Commit ที่เลือกและเก็บ lockfile ที่เกี่ยวข้อง ไม่อัปเดตเป็นเวอร์ชันล่าสุดโดยอัตโนมัติ การตรวจว่า ID Contract เข้ากันได้กับ Build ยังเป็นงานที่จะออกแบบร่วมกับ Automation ภายหลัง
 
@@ -166,5 +183,5 @@ Mac Launcher จะค้นหา Node ใน PATH ก่อน หากไม
 
 - Remote: https://github.com/ChanonChaisakdanukool/IDFile.git
 - Local checkout ปัจจุบัน: /Users/chanoncha/IDFile
-- ติดตั้ง CocoaPods จาก Git ได้หลัง Push และสร้าง Tag 0.1.0 (ยังไม่ได้สร้างโดยขั้นตอนนี้)
+- ติดตั้ง SPM จาก Git ได้หลัง Push Package.swift แล้ว; Version Rule ต้องมี SemVer Tag ก่อน
 - npm สามารถใช้ Git URL พร้อม Commit/Tag หลัง Push; Android ยังต้อง Build Maven artifact
