@@ -1,0 +1,34 @@
+{
+  "name": "shared-element-ids",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "validate": "node scripts/ids.mjs validate",
+    "generate": "node scripts/ids.mjs generate",
+    "check": "node scripts/ids.mjs check",
+    "test": "node --test",
+    "build": "node scripts/ids.mjs generate",
+    "prepack": "node scripts/ids.mjs check && node --test"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "description": "Shared element ID constants",
+  "license": "UNLICENSED",
+  "main": "./dist/elementIds.js",
+  "types": "./dist/elementIds.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/elementIds.d.ts",
+      "import": "./dist/elementIds.js",
+      "default": "./dist/elementIds.js"
+    }
+  },
+  "files": [
+    "dist",
+    "element-ids.json",
+    "README.md",
+    "LICENSE"
+  ]
+}

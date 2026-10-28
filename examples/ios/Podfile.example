@@ -1,0 +1,5 @@
+platform :ios, '13.0'
+target 'YourApp' do
+  use_frameworks!
+  pod 'SharedElementIds', :path => '/absolute/path/to/IDFile'
+end
