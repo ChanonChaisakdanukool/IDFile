@@ -39,7 +39,7 @@ import SharedElementIds
 button.accessibilityIdentifier = ElementIds.idBegin
 ```
 
-iOS ขั้นต่ำ 13.0 เป็นค่าเริ่มต้นที่ปรับได้ Podspec มี URL example.invalid เป็น placeholder ต้องแทนด้วย Git/Homepage จริงก่อน remote release
+iOS ขั้นต่ำ 13.0 เป็นค่าเริ่มต้นที่ปรับได้ Podspec ใช้ Git Repo จริงแล้ว การติดตั้งผ่าน Git ด้วย Tag 0.1.0 ต้อง Push โค้ดและสร้าง Tag นั้นก่อน
 
 ## Android — Gradle / Maven Local Folder
 
@@ -118,7 +118,7 @@ Generated constants ไม่ได้ผูก ID ให้ UI อัตโน�
 
 ## Repository และผู้ใช้งานร่วมกัน
 
-IDFile จะเป็น Git Repository แยกของตัวเอง ไม่อยู่ภายใน Automation Repo และไม่ผูกกับแอปใดแอปหนึ่ง ปัจจุบันยังไม่มี remote URL และยังไม่ได้สร้าง Automation Repo
+IDFile จะเป็น Git Repository แยกของตัวเอง ไม่อยู่ภายใน Automation Repo และไม่ผูกกับแอปใดแอปหนึ่ง Remote: https://github.com/ChanonChaisakdanukool/IDFile.git ส่วน Automation Repo ยังไม่ได้สร้าง
 
 ผู้ใช้งาน Library มีทั้ง iOS App, Android App, Web / Mini App และ Automation โดย Automation TypeScript ติดตั้ง npm package เดียวกับ Web และอ้างอิง ElementIds โดยตรง ห้ามคัดลอก ID ไปดูแลเป็นรายการอีกชุดใน Automation
 
@@ -160,3 +160,11 @@ Automation เป็นผู้รับ Library จึงไม่ต้อง
 Windows .bat ต้องเปิดบน Windows ส่วน Mac ใช้ .command แทน หากย้ายผ่านช่องทางที่ทำให้ executable permission หาย ให้รัน chmod +x Generate.command ในโฟลเดอร์ IDFile หนึ่งครั้ง
 
 Mac Launcher จะค้นหา Node ใน PATH ก่อน หากไม่พบจะลอง runtime ที่มากับ Codex ใน ~/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node และตรวจว่ารุ่น 22 ขึ้นไป ตำแหน่งนี้เป็นทางสำรองสำหรับเครื่องที่มี Codex; เครื่อง Dev อื่นติดตั้ง Node.js ตามปกติได้
+
+
+## Git Repository
+
+- Remote: https://github.com/ChanonChaisakdanukool/IDFile.git
+- Local checkout ปัจจุบัน: /Users/chanoncha/IDFile
+- ติดตั้ง CocoaPods จาก Git ได้หลัง Push และสร้าง Tag 0.1.0 (ยังไม่ได้สร้างโดยขั้นตอนนี้)
+- npm สามารถใช้ Git URL พร้อม Commit/Tag หลัง Push; Android ยังต้อง Build Maven artifact
