@@ -1,6 +1,9 @@
-# Legacy CocoaPods only. New consumers should use SPM; see SPM.md.
+# Choose CocoaPods or SPM per consumer target; both expose SharedElementIds.
 platform :ios, '13.0'
 target 'YourApp' do
   use_frameworks!
-  pod 'SharedElementIds', :path => '/absolute/path/to/IDFile'
+  pod 'SharedElementIds', :git => 'https://github.com/ChanonChaisakdanukool/IDFile.git', :branch => 'main'
+  # Pin :commit instead of :branch for reproducible builds.
+  # Local alternative:
+  # pod 'SharedElementIds', :path => '/absolute/path/to/IDFile'
 end

@@ -3,7 +3,14 @@
 ต้นฉบับกลาง `element-ids.json`:
 
 ```json
-["idBegin", "idBegin2", "idBegin3"]
+{
+  "mainApp": {
+    "main": ["mainAppPageView", "mainAppPageLoginButton"]
+  },
+  "authentication": {
+    "login": ["loginPageView", "loginPagePhoneTextField", "loginPageLoginButton"]
+  }
+}
 ```
 
 ## ผู้ดูแล ID Repo
@@ -18,7 +25,13 @@ npm test
 ```
 
 แก้ JSON แล้ว generate และ commit generated/ กับ dist/ ร่วมกัน ผู้ติดตั้ง Library ไม่ต้องรัน Generator
-รูปแบบ Array ของ string: ระบุชื่อ ID ครั้งเดียว ห้ามซ้ำ ใช้ lowerCamelCase ตัวอักษรอังกฤษและตัวเลข หลีกเลี่ยงคำสงวน ชื่อจริงใช้ pageName + elementPurpose + elementType ตามเอกสารเดิม ส่วน idBegin เป็นค่าเริ่มต้นที่กำหนด
+รูปแบบหลักคือ Feature → Page → Array ของ ID โดย Feature/Page ใช้ lowerCamelCase และแต่ละกลุ่มต้องไม่ว่าง ID ต้องไม่ซ้ำทั้งไฟล์แม้อยู่คนละกลุ่ม ใช้ pageName + elementPurpose + elementType และหลีกเลี่ยงคำสงวน
+
+Generator สร้าง namespace ตาม Feature/Page: Swift เป็น nested public struct, Kotlin เป็น nested object (ชื่อกลุ่มขึ้นต้นตัวใหญ่) ส่วน Web/Automation เป็น nested object ตามชื่อ JSON และ freeze ทุกระดับ TypeScript ElementId เป็น union ของค่า ID ปลายทางทั้งหมด
+
+นี่เป็น breaking API change: เปลี่ยน `ElementIds.loginPagePhoneTextField` เป็น `ElementIds.Authentication.Login.loginPagePhoneTextField` สำหรับ Swift/Kotlin หรือ `ElementIds.authentication.login.loginPagePhoneTextField` สำหรับ Web/Automation ค่า string เดิมไม่เปลี่ยน การย้ายกลุ่มเปลี่ยนเส้นทาง API ด้วย ต้องอัปเดต consumer และ pin commit/version ใหม่ ไม่มี flat alias ชื่อกลุ่มห้ามใช้คำสงวน Generator ยังอ่าน flat array เดิมได้ แต่ JSON โปรเจกต์ใช้กลุ่มเป็นหลัก
+
+JSON ไม่รองรับ `//` comment ให้ใช้ชื่อกลุ่มแทน แก้ต้นฉบับแล้วรัน Generate.command (macOS) หรือ Generate.bat (Windows) ทุกครั้ง
 
 ## iOS — Swift Package Manager (SPM)
 
@@ -35,7 +48,7 @@ Package.swift ที่ root ประกาศ Product และ Module ชื�
 
 ```swift
 import SharedElementIds
-button.accessibilityIdentifier = ElementIds.idBegin
+button.accessibilityIdentifier = ElementIds.MainApp.Main.mainAppPageLoginButton
 ```
 
 ### ใช้จาก Swift Package อื่น
@@ -52,10 +65,32 @@ button.accessibilityIdentifier = ElementIds.idBegin
 ก่อน release ควรล็อก Commit หรือ Version Tag ตามนโยบายทีม และเก็บ Package.resolved ที่เกี่ยวข้อง
 ถ้า Source อยู่ใน Module ย่อย ต้องประกาศ Dependency ที่ Module นั้นด้วย การเพิ่มให้ App Target อย่างเดียวไม่ได้ทำให้ทุก Module Import ได้
 
-### ย้ายจาก CocoaPods
+### CocoaPods (รองรับควบคู่กับ SPM)
 
-ถอด SharedElementIds จาก Podfile / Podspec ของผู้ใช้ที่เคยประกาศ แล้วอัปเดต Pods ก่อนเพิ่ม SPM ไม่ให้ Module เดียวกันเข้าผ่านสองช่องทางพร้อมกัน
-Podspec และ Podfile.example เดิมเก็บไว้สำหรับ Consumer ที่ยังไม่ย้ายเท่านั้น SPM เป็นช่องทางหลักใหม่ ไม่ต้อง pod install สำหรับการติดตั้ง SPM
+เลือกใช้ SPM หรือ CocoaPods ตามโปรเจกต์ ทั้งสองทาง compile จาก generated/swift และใช้ module SharedElementIds เดียวกัน ไม่ควรเพิ่ม Library นี้ซ้ำสองช่องทางใน target เดียวกัน
+
+ติดตั้งจาก Git โดยเลือก commit ที่มีไฟล์ generated ล่าสุด:
+
+```ruby
+pod 'SharedElementIds', :git => 'https://github.com/ChanonChaisakdanukool/IDFile.git', :branch => 'main'
+# สำหรับเวอร์ชันที่แน่นอน เปลี่ยน :branch เป็น :commit => 'COMMIT_SHA'
+# หรือ :tag => '0.1.0' เมื่อสร้างและ push tag นั้นแล้ว
+```
+
+ติดตั้งจาก local:
+
+```ruby
+pod 'SharedElementIds', :path => '/absolute/path/to/IDFile'
+```
+
+รัน `pod install` แล้วเปิด .xcworkspace หากโค้ดอยู่ใน Pod ย่อย ให้เพิ่ม `s.dependency 'SharedElementIds'` ใน podspec ของ module นั้นด้วย และประกาศแหล่ง Git ใน Podfile ของแอป ไม่ใช่เพิ่มเฉพาะ App target
+
+```swift
+import SharedElementIds
+let phoneId = ElementIds.Authentication.Login.loginPagePhoneTextField
+```
+
+SPM และ CocoaPods ใช้ API นี้เหมือนกัน ผู้ติดตั้งไม่ต้องรัน Node.js หรือ generate เอง ผู้ดูแล IDFile ต้อง commit generated Swift ให้ตรงกับ JSON ก่อนเผยแพร่ การรองรับ CocoaPods ไม่ได้หมายความว่าเผยแพร่ขึ้น CocoaPods Trunk แล้ว
 
 ## Android — Gradle / Maven Local Folder
 
@@ -83,7 +118,7 @@ implementation("local.shared:element-ids:0.1.0")
 
 ```kotlin
 import local.shared.elementids.ElementIds
-val id = ElementIds.idBegin
+val id = ElementIds.MainApp.Main.mainAppPageLoginButton
 ```
 
 ต้องเลือกวิธีผูก ID ให้ตรง View/Compose และ Selector ไม่ใช้ ID ภายในแทนข้อความที่ระบบช่วยการเข้าถึงอ่าน
@@ -104,13 +139,13 @@ npm install /absolute/path/to/IDFile/shared-element-ids-0.1.0.tgz
 
 ```ts
 import { ElementIds, type ElementId } from 'shared-element-ids';
-const id: ElementId = ElementIds.idBegin;
+const id: ElementId = ElementIds.mainApp.main.mainAppPageLoginButton;
 ```
 
 React:
 
 ```tsx
-<button data-testid={ElementIds.idBegin}>เริ่มต้น</button>
+<button data-testid={ElementIds.mainApp.main.mainAppPageLoginButton}>เริ่มต้น</button>
 ```
 
 ESM พร้อม JavaScript และ .d.ts สร้างจาก JSON โดยตรง ไม่ต้องใช้ TypeScript compiler ตอนติดตั้ง private:true ป้องกัน publish Registry โดยไม่ตั้งใจ แต่ยัง pack และติดตั้ง local ได้
@@ -122,7 +157,7 @@ ESM พร้อม JavaScript และ .d.ts สร้างจาก JSON โ
 - generated/: Swift, Kotlin, TypeScript
 - dist/: JavaScript และ .d.ts สำหรับ npm
 - Package.swift: Swift Package Manager สำหรับ iOS
-- SharedElementIds.podspec: Legacy CocoaPods ระหว่างย้าย Consumer
+- SharedElementIds.podspec: รองรับ CocoaPods ควบคู่กับ SPM
 - android/: Gradle build และ Maven publishing แบบ local
 - examples/: ตัวอย่างแต่ละฝั่ง
 - test/: Generator และ package consistency checks
@@ -154,7 +189,7 @@ npm install --save-dev /absolute/path/to/IDFile/shared-element-ids-0.1.0.tgz
 
 ```ts
 import { ElementIds, type ElementId } from 'shared-element-ids';
-const targetId: ElementId = ElementIds.idBegin;
+const targetId: ElementId = ElementIds.mainApp.main.mainAppPageLoginButton;
 ```
 
 Automation เป็นผู้รับ Library จึงไม่ต้องรัน Generator และไม่ต้องอ่านไฟล์จาก path ของ ID Repo ตอนรันทดสอบ ให้ layer สำหรับ Selector ของ Automation แปลง ID เป็น locator ตาม Platform จริง

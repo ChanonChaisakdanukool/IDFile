@@ -1,5 +1,5 @@
 import UIKit
 import SharedElementIds
 func attachId(to button: UIButton) {
-    button.accessibilityIdentifier = ElementIds.idBegin
+    button.accessibilityIdentifier = ElementIds.MainApp.Main.mainAppPageLoginButton
 }

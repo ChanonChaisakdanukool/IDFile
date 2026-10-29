@@ -1,5 +1,31 @@
-[
-  "idBegin",
-  "idBegin2",
-  "idBegin3"
-]
+{
+  "mainApp": {
+    "main": [
+      "mainAppPageView",
+      "mainAppPageLoginButton"
+    ]
+  },
+  "authentication": {
+    "loginConfirm": [
+      "loginConfirmPopupView",
+      "loginConfirmPopupConfirmButton"
+    ],
+    "login": [
+      "loginPageView",
+      "loginPagePhoneTextField",
+      "loginPageLoginButton"
+    ],
+    "latestLogin": [
+      "latestLoginPageView",
+      "latestLoginPageLatestLoginLoginButton",
+      "latestLoginPageLatestLoginNormalLoginButton"
+    ],
+    "phoneOtp": [
+      "loginPhoneOtpPageView",
+      "loginPhoneOtpPageMobileNoLabel",
+      "loginPhoneOtpPageOtpTextField",
+      "loginPhoneOtpPageResendButton",
+      "loginPhoneOtpPageOtpAlertLabel"
+    ]
+  }
+}

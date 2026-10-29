@@ -32,6 +32,50 @@ test('all package versions agree', async () => {
 
 test('npm export imports the shared ID at runtime', async () => {
   const { ElementIds } = await import('shared-element-ids');
-  assert.equal(ElementIds.idBegin, 'idBegin');
+  const { readFile } = await import('node:fs/promises');
+  const ids = validateIds(JSON.parse(await readFile(new URL('../element-ids.json', import.meta.url), 'utf8')));
+  function leaves(node) {
+    assert.ok(Object.isFrozen(node));
+    return Object.values(node).flatMap(value => typeof value === 'string' ? [value] : leaves(value));
+  }
+  assert.deepEqual(leaves(ElementIds).sort(), [...ids].sort());
+  assert.equal(ElementIds.authentication.login.loginPagePhoneTextField, 'loginPagePhoneTextField');
+  assert.equal(ElementIds.loginPagePhoneTextField, undefined);
   assert.ok(Object.isFrozen(ElementIds));
+});
+
+test('groups preserve nested API and stable output regardless of source order', () => {
+  const first = { shop: { cart: ['totalLabel', 'buyButton'] }, auth: { login: ['loginButton'] } };
+  const second = { auth: { login: ['loginButton'] }, shop: { cart: ['buyButton', 'totalLabel'] } };
+  assert.deepEqual(render(first), render(second));
+  for (const content of Object.values(render(first))) {
+    assert.match(content, /Auth|auth/);
+    assert.match(content, /Cart|cart/);
+    assert.match(content, /buyButton/);
+  }
+  assert.deepEqual(validateIds(first).sort(), ['buyButton', 'loginButton', 'totalLabel']);
+});
+
+test('rejects duplicate IDs across pages and malformed groups', () => {
+  for (const contract of [
+    { auth: { login: ['sameId'], otp: ['sameId'] } },
+    { auth: { login: ['sameId'] }, shop: { cart: ['sameId'] } },
+    { auth: {} }, { auth: [] }, { auth: { login: [] } },
+    { auth: { login: 'bad' } }, { auth: { login: [123] } },
+    { 'bad/name': { login: ['validId'] } },
+    { auth: { 'bad\nname': ['validId'] } },
+  ]) {
+    assert.throws(() => render(contract));
+  }
+});
+
+test('native namespace and TypeScript leaf union are generated', () => {
+  const output = render({ auth: { login: ['phoneInput'] } });
+  assert.match(output['generated/swift/ElementIds.swift'], /public struct Auth/);
+  assert.match(output['generated/swift/ElementIds.swift'], /public struct Login/);
+  assert.match(output['generated/kotlin/ElementIds.kt'], /object Auth/);
+  assert.match(output['generated/typescript/elementIds.ts'], /LeafValue<typeof ElementIds>/);
+  for (const name of ['class', 'self', 'constructor']) {
+    assert.throws(() => render({ [name]: { login: ['phoneInput'] } }));
+  }
 });
