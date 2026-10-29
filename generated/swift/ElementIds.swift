@@ -17,6 +17,7 @@ public struct ElementIds {
         }
         public struct LoginConfirm {
             private init() {}
+            public static let loginConfirmPopupCancelButton = "loginConfirmPopupCancelButton"
             public static let loginConfirmPopupConfirmButton = "loginConfirmPopupConfirmButton"
             public static let loginConfirmPopupView = "loginConfirmPopupView"
         }

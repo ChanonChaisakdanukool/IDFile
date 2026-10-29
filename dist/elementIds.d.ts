@@ -12,6 +12,7 @@ export declare const ElementIds: {
       readonly loginPageView: "loginPageView";
     };
     readonly loginConfirm: {
+      readonly loginConfirmPopupCancelButton: "loginConfirmPopupCancelButton";
       readonly loginConfirmPopupConfirmButton: "loginConfirmPopupConfirmButton";
       readonly loginConfirmPopupView: "loginConfirmPopupView";
     };

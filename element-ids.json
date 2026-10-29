@@ -8,7 +8,8 @@
   "authentication": {
     "loginConfirm": [
       "loginConfirmPopupView",
-      "loginConfirmPopupConfirmButton"
+      "loginConfirmPopupConfirmButton",
+      "loginConfirmPopupCancelButton"
     ],
     "login": [
       "loginPageView",

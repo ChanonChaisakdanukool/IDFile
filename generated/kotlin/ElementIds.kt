@@ -14,6 +14,7 @@ object ElementIds {
             const val loginPageView = "loginPageView"
         }
         object LoginConfirm {
+            const val loginConfirmPopupCancelButton = "loginConfirmPopupCancelButton"
             const val loginConfirmPopupConfirmButton = "loginConfirmPopupConfirmButton"
             const val loginConfirmPopupView = "loginConfirmPopupView"
         }

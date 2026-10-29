@@ -12,6 +12,7 @@ export const ElementIds = Object.freeze({
       loginPageView: "loginPageView",
     }),
     loginConfirm: Object.freeze({
+      loginConfirmPopupCancelButton: "loginConfirmPopupCancelButton",
       loginConfirmPopupConfirmButton: "loginConfirmPopupConfirmButton",
       loginConfirmPopupView: "loginConfirmPopupView",
     }),
