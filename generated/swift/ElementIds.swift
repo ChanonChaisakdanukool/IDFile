@@ -1,4 +1,6 @@
 // Generated from element-ids.json. Do not edit directly.
+import Foundation
+
 public struct ElementIds {
     private init() {}
     public struct Authentication {
@@ -44,4 +46,11 @@ public struct ElementIds {
             public static let profilePageView = "profilePageView"
         }
     }
+    /// Compose a stable row ID using an opaque reference; refresh when reusing cells.
+    public static func withKey(_ baseId: String, key: String) -> String {
+        precondition(baseId.range(of: "^[a-z][A-Za-z0-9]*$", options: .regularExpression) != nil && !baseId.contains("\n") && !baseId.contains("\r"), "Invalid base ID")
+        precondition(key.range(of: "^[A-Za-z0-9][A-Za-z0-9_-]*$", options: .regularExpression) != nil && !key.contains("\n") && !key.contains("\r"), "Invalid item key")
+        return baseId + "__" + key
+    }
+
 }

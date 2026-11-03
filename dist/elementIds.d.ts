@@ -39,3 +39,5 @@ export declare const ElementIds: {
 
 type LeafValue<T> = T extends string ? T : { [K in keyof T]: LeafValue<T[K]> }[keyof T];
 export type ElementId = LeafValue<typeof ElementIds>;
+
+export declare function withKey(baseId: string, key: string): string;

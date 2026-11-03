@@ -79,3 +79,15 @@ test('native namespace and TypeScript leaf union are generated', () => {
     assert.throws(() => render({ [name]: { login: ['phoneInput'] } }));
   }
 });
+
+test('withKey preserves opaque keys and rejects unsafe or ambiguous inputs', async () => {
+  const { withKey } = await import('shared-element-ids');
+  assert.equal(withKey('accountCardView', 'ACC001'), 'accountCardView__ACC001');
+  assert.equal(withKey('accountCardView', '001-A_b'), 'accountCardView__001-A_b');
+  for (const key of ['', 1, null, undefined, ' ACC001', 'ACC001 ', 'ACC/001', 'ACC001\n', 'บัญชี']) {
+    assert.throws(() => withKey('accountCardView', key), TypeError);
+  }
+  for (const base of ['', null, 'accountCardView__ACC001', 'accountCardView\n']) {
+    assert.throws(() => withKey(base, 'ACC001'), TypeError);
+  }
+});

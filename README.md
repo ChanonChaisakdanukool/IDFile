@@ -220,3 +220,32 @@ Mac Launcher จะค้นหา Node ใน PATH ก่อน หากไม
 - Local checkout ปัจจุบัน: /Users/chanoncha/IDFile
 - ติดตั้ง SPM จาก Git ได้หลัง Push Package.swift แล้ว; Version Rule ต้องมี SemVer Tag ก่อน
 - npm สามารถใช้ Git URL พร้อม Commit/Tag หลัง Push; Android ยังต้อง Build Maven artifact
+
+### ID ของรายการที่มี Key จำเพาะ
+
+เก็บเฉพาะ ID กลางใน JSON แล้วประกอบ Key ตอนผูกข้อมูล UI และตอนค้นหา:
+
+```javascript
+import { withKey } from 'shared-element-ids';
+const cardId = withKey('accountCardView', 'ACC001');
+// accountCardView__ACC001
+```
+
+```swift
+card.accessibilityIdentifier = ElementIds.withKey("accountCardView", key: "ACC001")
+```
+
+```kotlin
+val cardId = ElementIds.withKey("accountCardView", "ACC001")
+// ผูกผ่านกลไก Accessibility/Test ID ที่ Automation ของแอปอ่านได้
+```
+
+ในโค้ดจริงใช้ constant จาก ElementIds แทนชื่อกลางแบบ literal ในตัวอย่างนี้
+Key ต้องเป็น string รูปแบบ `[A-Za-z0-9][A-Za-z0-9_-]*` เท่านั้น ไม่มีการ trim หรือแปลงเลขอัตโนมัติ
+ใช้ Reference ที่คงที่ ไม่ซ้ำภายใน List และไม่มีข้อมูลส่วนตัว ตัวคั่นคือ `__`
+Swift ใช้ precondition, Kotlin ใช้ require และ JavaScript โยน TypeError เมื่อข้อมูลไม่ถูกต้อง
+ตรวจข้อมูลต้นทางก่อนเรียก และอัปเดต ID ทุกครั้งที่ bind/reuse Cell
+ID ธรรมดาและโครง JSON เดิมยังใช้ได้ ไม่ต้องเพิ่ม ID ของทุกรายการใน JSON
+
+Automation ส่งผลลัพธ์ของ withKey() เข้า findByScrolling({ containerId, targetId }) ได้โดยตรง
+เมื่อไม่พบจะไม่เลือกแถวอื่นแทน การตรวจค่าเลขบัญชี/เบอร์โทรยังอ่านค่าจาก UI แยกจาก ID

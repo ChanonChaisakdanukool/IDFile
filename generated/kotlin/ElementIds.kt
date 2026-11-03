@@ -37,4 +37,11 @@ object ElementIds {
             const val profilePageView = "profilePageView"
         }
     }
+    /** Compose a stable row ID; refresh when binding recycled cells. */
+    fun withKey(baseId: String, key: String): String {
+        require(Regex("[a-z][A-Za-z0-9]*").matches(baseId)) { "Invalid base ID" }
+        require(Regex("[A-Za-z0-9][A-Za-z0-9_-]*").matches(key)) { "Invalid item key" }
+        return baseId + "__" + key
+    }
+
 }

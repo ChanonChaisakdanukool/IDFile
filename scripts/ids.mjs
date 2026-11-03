@@ -104,13 +104,39 @@ export function render(contract) {
     return `{\n${entries.join('\n')}\n${indent}}`;
   }
 
+  // Restrict keys to portable opaque references; never trim or coerce numbers.
+  const jsHelper = `
+/** Compose a stable row ID. Key is a non-sensitive reference, not a list index. */
+export function withKey(baseId, key) {
+  if (typeof baseId !== 'string' || /[\\r\\n]/.test(baseId) || !/^[a-z][A-Za-z0-9]*$/.test(baseId)) throw new TypeError('Invalid base ID.');
+  if (typeof key !== 'string' || /[\\r\\n]/.test(key) || !/^[A-Za-z0-9][A-Za-z0-9_-]*$/.test(key)) throw new TypeError('Invalid item key. Use a non-empty ASCII reference.');
+  return baseId + '__' + key;
+}
+`;
+  const tsHelper = jsHelper.replace('withKey(baseId, key)', 'withKey(baseId: string, key: string): string');
+  const swiftHelper = `
+    /// Compose a stable row ID using an opaque reference; refresh when reusing cells.
+    public static func withKey(_ baseId: String, key: String) -> String {
+        precondition(baseId.range(of: "^[a-z][A-Za-z0-9]*$", options: .regularExpression) != nil && !baseId.contains("\\n") && !baseId.contains("\\r"), "Invalid base ID")
+        precondition(key.range(of: "^[A-Za-z0-9][A-Za-z0-9_-]*$", options: .regularExpression) != nil && !key.contains("\\n") && !key.contains("\\r"), "Invalid item key")
+        return baseId + "__" + key
+    }
+`;
+  const kotlinHelper = `
+    /** Compose a stable row ID; refresh when binding recycled cells. */
+    fun withKey(baseId: String, key: String): String {
+        require(Regex("[a-z][A-Za-z0-9]*").matches(baseId)) { "Invalid base ID" }
+        require(Regex("[A-Za-z0-9][A-Za-z0-9_-]*").matches(key)) { "Invalid item key" }
+        return baseId + "__" + key
+    }
+`;
   const leafType = '\ntype LeafValue<T> = T extends string ? T : { [K in keyof T]: LeafValue<T[K]> }[keyof T];\nexport type ElementId = LeafValue<typeof ElementIds>;\n';
   return {
-    'dist/elementIds.js': header + `export const ElementIds = ${jsObject(tree)};\n`,
-    'dist/elementIds.d.ts': header + `export declare const ElementIds: ${typeObject(tree)};\n` + leafType,
-    'generated/swift/ElementIds.swift': header + 'public struct ElementIds {\n    private init() {}\n' + nativeBody(tree, 1, true) + '\n}\n',
-    'generated/kotlin/ElementIds.kt': header + 'package local.shared.elementids\n\nobject ElementIds {\n' + nativeBody(tree, 1, false) + '\n}\n',
-    'generated/typescript/elementIds.ts': header + `export const ElementIds = ${jsObject(tree)};\n` + leafType,
+    'dist/elementIds.js': header + `export const ElementIds = ${jsObject(tree)};\n` + jsHelper,
+    'dist/elementIds.d.ts': header + `export declare const ElementIds: ${typeObject(tree)};\n` + leafType + '\nexport declare function withKey(baseId: string, key: string): string;\n',
+    'generated/swift/ElementIds.swift': header + 'import Foundation\n\npublic struct ElementIds {\n    private init() {}\n' + nativeBody(tree, 1, true) + swiftHelper + '\n}\n',
+    'generated/kotlin/ElementIds.kt': header + 'package local.shared.elementids\n\nobject ElementIds {\n' + nativeBody(tree, 1, false) + kotlinHelper + '\n}\n',
+    'generated/typescript/elementIds.ts': header + `export const ElementIds = ${jsObject(tree)};\n` + leafType + tsHelper,
   };
 }
 

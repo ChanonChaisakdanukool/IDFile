@@ -39,3 +39,10 @@ export const ElementIds = Object.freeze({
 
 type LeafValue<T> = T extends string ? T : { [K in keyof T]: LeafValue<T[K]> }[keyof T];
 export type ElementId = LeafValue<typeof ElementIds>;
+
+/** Compose a stable row ID. Key is a non-sensitive reference, not a list index. */
+export function withKey(baseId: string, key: string): string {
+  if (typeof baseId !== 'string' || /[\r\n]/.test(baseId) || !/^[a-z][A-Za-z0-9]*$/.test(baseId)) throw new TypeError('Invalid base ID.');
+  if (typeof key !== 'string' || /[\r\n]/.test(key) || !/^[A-Za-z0-9][A-Za-z0-9_-]*$/.test(key)) throw new TypeError('Invalid item key. Use a non-empty ASCII reference.');
+  return baseId + '__' + key;
+}
