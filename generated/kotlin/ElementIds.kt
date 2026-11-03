@@ -33,5 +33,8 @@ object ElementIds {
             const val mainAppPageLoginButton = "mainAppPageLoginButton"
             const val mainAppPageView = "mainAppPageView"
         }
+        object Profile {
+            const val profilePageView = "profilePageView"
+        }
     }
 }

@@ -3,6 +3,9 @@
     "main": [
       "mainAppPageView",
       "mainAppPageLoginButton"
+    ],
+    "profile": [
+      "profilePageView"
     ]
   },
   "authentication": {

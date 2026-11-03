@@ -39,5 +39,9 @@ public struct ElementIds {
             public static let mainAppPageLoginButton = "mainAppPageLoginButton"
             public static let mainAppPageView = "mainAppPageView"
         }
+        public struct Profile {
+            private init() {}
+            public static let profilePageView = "profilePageView"
+        }
     }
 }

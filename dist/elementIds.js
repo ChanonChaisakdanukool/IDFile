@@ -31,5 +31,8 @@ export const ElementIds = Object.freeze({
       mainAppPageLoginButton: "mainAppPageLoginButton",
       mainAppPageView: "mainAppPageView",
     }),
+    profile: Object.freeze({
+      profilePageView: "profilePageView",
+    }),
   }),
 });

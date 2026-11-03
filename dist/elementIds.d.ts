@@ -31,6 +31,9 @@ export declare const ElementIds: {
       readonly mainAppPageLoginButton: "mainAppPageLoginButton";
       readonly mainAppPageView: "mainAppPageView";
     };
+    readonly profile: {
+      readonly profilePageView: "profilePageView";
+    };
   };
 };
 
