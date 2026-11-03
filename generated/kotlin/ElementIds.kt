@@ -19,9 +19,11 @@ object ElementIds {
             const val loginConfirmPopupView = "loginConfirmPopupView"
         }
         object PhoneOtp {
+            const val loginPhoneOtpPageBackButton = "loginPhoneOtpPageBackButton"
             const val loginPhoneOtpPageMobileNoLabel = "loginPhoneOtpPageMobileNoLabel"
             const val loginPhoneOtpPageOtpAlertLabel = "loginPhoneOtpPageOtpAlertLabel"
             const val loginPhoneOtpPageOtpTextField = "loginPhoneOtpPageOtpTextField"
+            const val loginPhoneOtpPageRefCodeLabel = "loginPhoneOtpPageRefCodeLabel"
             const val loginPhoneOtpPageResendButton = "loginPhoneOtpPageResendButton"
             const val loginPhoneOtpPageView = "loginPhoneOtpPageView"
         }

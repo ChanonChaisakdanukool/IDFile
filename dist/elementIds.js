@@ -17,9 +17,11 @@ export const ElementIds = Object.freeze({
       loginConfirmPopupView: "loginConfirmPopupView",
     }),
     phoneOtp: Object.freeze({
+      loginPhoneOtpPageBackButton: "loginPhoneOtpPageBackButton",
       loginPhoneOtpPageMobileNoLabel: "loginPhoneOtpPageMobileNoLabel",
       loginPhoneOtpPageOtpAlertLabel: "loginPhoneOtpPageOtpAlertLabel",
       loginPhoneOtpPageOtpTextField: "loginPhoneOtpPageOtpTextField",
+      loginPhoneOtpPageRefCodeLabel: "loginPhoneOtpPageRefCodeLabel",
       loginPhoneOtpPageResendButton: "loginPhoneOtpPageResendButton",
       loginPhoneOtpPageView: "loginPhoneOtpPageView",
     }),

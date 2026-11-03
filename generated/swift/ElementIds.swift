@@ -23,9 +23,11 @@ public struct ElementIds {
         }
         public struct PhoneOtp {
             private init() {}
+            public static let loginPhoneOtpPageBackButton = "loginPhoneOtpPageBackButton"
             public static let loginPhoneOtpPageMobileNoLabel = "loginPhoneOtpPageMobileNoLabel"
             public static let loginPhoneOtpPageOtpAlertLabel = "loginPhoneOtpPageOtpAlertLabel"
             public static let loginPhoneOtpPageOtpTextField = "loginPhoneOtpPageOtpTextField"
+            public static let loginPhoneOtpPageRefCodeLabel = "loginPhoneOtpPageRefCodeLabel"
             public static let loginPhoneOtpPageResendButton = "loginPhoneOtpPageResendButton"
             public static let loginPhoneOtpPageView = "loginPhoneOtpPageView"
         }

@@ -17,9 +17,11 @@ export declare const ElementIds: {
       readonly loginConfirmPopupView: "loginConfirmPopupView";
     };
     readonly phoneOtp: {
+      readonly loginPhoneOtpPageBackButton: "loginPhoneOtpPageBackButton";
       readonly loginPhoneOtpPageMobileNoLabel: "loginPhoneOtpPageMobileNoLabel";
       readonly loginPhoneOtpPageOtpAlertLabel: "loginPhoneOtpPageOtpAlertLabel";
       readonly loginPhoneOtpPageOtpTextField: "loginPhoneOtpPageOtpTextField";
+      readonly loginPhoneOtpPageRefCodeLabel: "loginPhoneOtpPageRefCodeLabel";
       readonly loginPhoneOtpPageResendButton: "loginPhoneOtpPageResendButton";
       readonly loginPhoneOtpPageView: "loginPhoneOtpPageView";
     };
