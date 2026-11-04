@@ -5,6 +5,18 @@ public struct ElementIds {
     private init() {}
     public struct Authentication {
         private init() {}
+        public struct EmailLogin {
+            private init() {}
+            public static let loginEmailPageEmailTextField = "loginEmailPageEmailTextField"
+            public static let loginEmailPageLoginButton = "loginEmailPageLoginButton"
+            public static let loginEmailPagePasswordTextField = "loginEmailPagePasswordTextField"
+            public static let loginEmailPageView = "loginEmailPageView"
+        }
+        public struct EmailOtp {
+            private init() {}
+            public static let loginEmailOtpPageOtpTextField = "loginEmailOtpPageOtpTextField"
+            public static let loginEmailOtpPageView = "loginEmailOtpPageView"
+        }
         public struct LatestLogin {
             private init() {}
             public static let latestLoginPageLatestLoginLoginButton = "latestLoginPageLatestLoginLoginButton"
@@ -13,6 +25,7 @@ public struct ElementIds {
         }
         public struct Login {
             private init() {}
+            public static let loginPageEmailButton = "loginPageEmailButton"
             public static let loginPageLoginButton = "loginPageLoginButton"
             public static let loginPagePhoneTextField = "loginPagePhoneTextField"
             public static let loginPageView = "loginPageView"

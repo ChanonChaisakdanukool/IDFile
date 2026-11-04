@@ -1,12 +1,23 @@
 // Generated from element-ids.json. Do not edit directly.
 export const ElementIds = Object.freeze({
   authentication: Object.freeze({
+    emailLogin: Object.freeze({
+      loginEmailPageEmailTextField: "loginEmailPageEmailTextField",
+      loginEmailPageLoginButton: "loginEmailPageLoginButton",
+      loginEmailPagePasswordTextField: "loginEmailPagePasswordTextField",
+      loginEmailPageView: "loginEmailPageView",
+    }),
+    emailOtp: Object.freeze({
+      loginEmailOtpPageOtpTextField: "loginEmailOtpPageOtpTextField",
+      loginEmailOtpPageView: "loginEmailOtpPageView",
+    }),
     latestLogin: Object.freeze({
       latestLoginPageLatestLoginLoginButton: "latestLoginPageLatestLoginLoginButton",
       latestLoginPageLatestLoginNormalLoginButton: "latestLoginPageLatestLoginNormalLoginButton",
       latestLoginPageView: "latestLoginPageView",
     }),
     login: Object.freeze({
+      loginPageEmailButton: "loginPageEmailButton",
       loginPageLoginButton: "loginPageLoginButton",
       loginPagePhoneTextField: "loginPagePhoneTextField",
       loginPageView: "loginPageView",

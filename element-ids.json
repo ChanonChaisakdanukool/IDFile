@@ -17,7 +17,8 @@
     "login": [
       "loginPageView",
       "loginPagePhoneTextField",
-      "loginPageLoginButton"
+      "loginPageLoginButton",
+      "loginPageEmailButton"
     ],
     "latestLogin": [
       "latestLoginPageView",
@@ -32,6 +33,16 @@
       "loginPhoneOtpPageOtpAlertLabel",
       "loginPhoneOtpPageBackButton",
       "loginPhoneOtpPageRefCodeLabel"
+    ],
+    "emailLogin": [
+      "loginEmailPageView",
+      "loginEmailPageEmailTextField",
+      "loginEmailPagePasswordTextField",
+      "loginEmailPageLoginButton"
+    ],
+    "emailOtp": [
+      "loginEmailOtpPageView",
+      "loginEmailOtpPageOtpTextField"
     ]
   }
 }

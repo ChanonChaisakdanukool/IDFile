@@ -3,12 +3,23 @@ package local.shared.elementids
 
 object ElementIds {
     object Authentication {
+        object EmailLogin {
+            const val loginEmailPageEmailTextField = "loginEmailPageEmailTextField"
+            const val loginEmailPageLoginButton = "loginEmailPageLoginButton"
+            const val loginEmailPagePasswordTextField = "loginEmailPagePasswordTextField"
+            const val loginEmailPageView = "loginEmailPageView"
+        }
+        object EmailOtp {
+            const val loginEmailOtpPageOtpTextField = "loginEmailOtpPageOtpTextField"
+            const val loginEmailOtpPageView = "loginEmailOtpPageView"
+        }
         object LatestLogin {
             const val latestLoginPageLatestLoginLoginButton = "latestLoginPageLatestLoginLoginButton"
             const val latestLoginPageLatestLoginNormalLoginButton = "latestLoginPageLatestLoginNormalLoginButton"
             const val latestLoginPageView = "latestLoginPageView"
         }
         object Login {
+            const val loginPageEmailButton = "loginPageEmailButton"
             const val loginPageLoginButton = "loginPageLoginButton"
             const val loginPagePhoneTextField = "loginPagePhoneTextField"
             const val loginPageView = "loginPageView"
