@@ -241,11 +241,18 @@ val cardId = ElementIds.withKey("accountCardView", "ACC001")
 ```
 
 ในโค้ดจริงใช้ constant จาก ElementIds แทนชื่อกลางแบบ literal ในตัวอย่างนี้
-Key ต้องเป็น string รูปแบบ `[A-Za-z0-9][A-Za-z0-9_-]*` เท่านั้น ไม่มีการ trim หรือแปลงเลขอัตโนมัติ
+Key ต้องเป็น string โดยค่าที่ตรง `[A-Za-z0-9][A-Za-z0-9_-]*` จะคงเดิม ส่วนค่าอื่นเข้ารหัส UTF-16 ไม่มีการ trim หรือแปลงเลขอัตโนมัติ
 ใช้ Reference ที่คงที่ ไม่ซ้ำภายใน List และไม่มีข้อมูลส่วนตัว ตัวคั่นคือ `__`
-Swift ใช้ precondition, Kotlin ใช้ require และ JavaScript โยน TypeError เมื่อข้อมูลไม่ถูกต้อง
+Swift/Kotlin รองรับ string ทุกค่าโดยไม่ crash ส่วน JavaScript โยน TypeError เฉพาะ argument ที่ไม่ใช่ string
 ตรวจข้อมูลต้นทางก่อนเรียก และอัปเดต ID ทุกครั้งที่ bind/reuse Cell
 ID ธรรมดาและโครง JSON เดิมยังใช้ได้ ไม่ต้องเพิ่ม ID ของทุกรายการใน JSON
 
 Automation ส่งผลลัพธ์ของ withKey() เข้า findByScrolling({ containerId, targetId }) ได้โดยตรง
 เมื่อไม่พบจะไม่เลือกแถวอื่นแทน การตรวจค่าเลขบัญชี/เบอร์โทรยังอ่านค่าจาก UI แยกจาก ID
+
+### Runtime key encoding
+
+`withKey` accepts string base IDs and keys. Valid legacy values retain exactly the same ID.
+Other keys (including empty strings, punctuation, whitespace and Unicode) use `_u` followed by lowercase four-digit hexadecimal UTF-16 code units. Invalid base IDs use `_b` with the same encoding. Empty values produce just their prefix. Components are joined with `__`. The reserved prefixes cannot occur at the start of a valid legacy component, so encoded and legacy values remain distinct. No trimming or Unicode normalization is performed.
+
+Swift and Kotlin no longer trap or throw for invalid string contents. JavaScript still rejects non-string arguments, matching the TypeScript/Swift/Kotlin string contract. Encoding is reversible and is not anonymization; continue using non-sensitive references. Use the same helper version in the app and automation. Edit the generator and regenerate all languages together.

@@ -59,11 +59,16 @@ public struct ElementIds {
             public static let profilePageView = "profilePageView"
         }
     }
-    /// Compose a stable row ID using an opaque reference; refresh when reusing cells.
+    /// Encode non-sensitive references; refresh when reusing cells.
     public static func withKey(_ baseId: String, key: String) -> String {
-        precondition(baseId.range(of: "^[a-z][A-Za-z0-9]*$", options: .regularExpression) != nil && !baseId.contains("\n") && !baseId.contains("\r"), "Invalid base ID")
-        precondition(key.range(of: "^[A-Za-z0-9][A-Za-z0-9_-]*$", options: .regularExpression) != nil && !key.contains("\n") && !key.contains("\r"), "Invalid item key")
-        return baseId + "__" + key
+        func encode(_ value: String) -> String {
+            value.utf16.map { String(format: "%04x", Int($0)) }.joined()
+        }
+        let validBase = baseId.range(of: "^[a-z][A-Za-z0-9]*$", options: .regularExpression) != nil
+            && !baseId.contains("\n") && !baseId.contains("\r")
+        let validKey = key.range(of: "^[A-Za-z0-9][A-Za-z0-9_-]*$", options: .regularExpression) != nil
+            && !key.contains("\n") && !key.contains("\r")
+        return (validBase ? baseId : "_b" + encode(baseId)) + "__" + (validKey ? key : "_u" + encode(key))
     }
 
 }

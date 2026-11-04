@@ -48,11 +48,13 @@ object ElementIds {
             const val profilePageView = "profilePageView"
         }
     }
-    /** Compose a stable row ID; refresh when binding recycled cells. */
+    /** Encode non-sensitive references; refresh when binding recycled cells. */
     fun withKey(baseId: String, key: String): String {
-        require(Regex("[a-z][A-Za-z0-9]*").matches(baseId)) { "Invalid base ID" }
-        require(Regex("[A-Za-z0-9][A-Za-z0-9_-]*").matches(key)) { "Invalid item key" }
-        return baseId + "__" + key
+        fun encode(value: String): String =
+            value.map { it.code.toString(16).padStart(4, '0') }.joinToString("")
+        val base = if (Regex("[a-z][A-Za-z0-9]*").matches(baseId)) baseId else "_b" + encode(baseId)
+        val item = if (Regex("[A-Za-z0-9][A-Za-z0-9_-]*").matches(key)) key else "_u" + encode(key)
+        return base + "__" + item
     }
 
 }

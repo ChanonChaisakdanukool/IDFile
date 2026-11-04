@@ -104,30 +104,46 @@ export function render(contract) {
     return `{\n${entries.join('\n')}\n${indent}}`;
   }
 
-  // Restrict keys to portable opaque references; never trim or coerce numbers.
+  // Fixed-width UTF-16 encoding uses prefixes outside the legacy ID grammar.
   const jsHelper = `
-/** Compose a stable row ID. Key is a non-sensitive reference, not a list index. */
+/** Compose IDs from non-sensitive strings, preserving valid legacy IDs. */
 export function withKey(baseId, key) {
-  if (typeof baseId !== 'string' || /[\\r\\n]/.test(baseId) || !/^[a-z][A-Za-z0-9]*$/.test(baseId)) throw new TypeError('Invalid base ID.');
-  if (typeof key !== 'string' || /[\\r\\n]/.test(key) || !/^[A-Za-z0-9][A-Za-z0-9_-]*$/.test(key)) throw new TypeError('Invalid item key. Use a non-empty ASCII reference.');
-  return baseId + '__' + key;
+  if (typeof baseId !== 'string' || typeof key !== 'string') throw new TypeError('withKey requires strings.');
+  const encode = value => {
+    let result = '';
+    for (let index = 0; index < value.length; index++) {
+      result += value.charCodeAt(index).toString(16).padStart(4, '0');
+    }
+    return result;
+  };
+  const base = /^[a-z][A-Za-z0-9]*$/.test(baseId) && !/[\\r\\n]/.test(baseId) ? baseId : '_b' + encode(baseId);
+  const item = /^[A-Za-z0-9][A-Za-z0-9_-]*$/.test(key) && !/[\\r\\n]/.test(key) ? key : '_u' + encode(key);
+  return base + '__' + item;
 }
 `;
-  const tsHelper = jsHelper.replace('withKey(baseId, key)', 'withKey(baseId: string, key: string): string');
+  const tsHelper = jsHelper.replace('withKey(baseId, key)', 'withKey(baseId: string, key: string): string')
+    .replace('encode = value =>', 'encode = (value: string): string =>');
   const swiftHelper = `
-    /// Compose a stable row ID using an opaque reference; refresh when reusing cells.
+    /// Encode non-sensitive references; refresh when reusing cells.
     public static func withKey(_ baseId: String, key: String) -> String {
-        precondition(baseId.range(of: "^[a-z][A-Za-z0-9]*$", options: .regularExpression) != nil && !baseId.contains("\\n") && !baseId.contains("\\r"), "Invalid base ID")
-        precondition(key.range(of: "^[A-Za-z0-9][A-Za-z0-9_-]*$", options: .regularExpression) != nil && !key.contains("\\n") && !key.contains("\\r"), "Invalid item key")
-        return baseId + "__" + key
+        func encode(_ value: String) -> String {
+            value.utf16.map { String(format: "%04x", Int($0)) }.joined()
+        }
+        let validBase = baseId.range(of: "^[a-z][A-Za-z0-9]*$", options: .regularExpression) != nil
+            && !baseId.contains("\\n") && !baseId.contains("\\r")
+        let validKey = key.range(of: "^[A-Za-z0-9][A-Za-z0-9_-]*$", options: .regularExpression) != nil
+            && !key.contains("\\n") && !key.contains("\\r")
+        return (validBase ? baseId : "_b" + encode(baseId)) + "__" + (validKey ? key : "_u" + encode(key))
     }
 `;
   const kotlinHelper = `
-    /** Compose a stable row ID; refresh when binding recycled cells. */
+    /** Encode non-sensitive references; refresh when binding recycled cells. */
     fun withKey(baseId: String, key: String): String {
-        require(Regex("[a-z][A-Za-z0-9]*").matches(baseId)) { "Invalid base ID" }
-        require(Regex("[A-Za-z0-9][A-Za-z0-9_-]*").matches(key)) { "Invalid item key" }
-        return baseId + "__" + key
+        fun encode(value: String): String =
+            value.map { it.code.toString(16).padStart(4, '0') }.joinToString("")
+        val base = if (Regex("[a-z][A-Za-z0-9]*").matches(baseId)) baseId else "_b" + encode(baseId)
+        val item = if (Regex("[A-Za-z0-9][A-Za-z0-9_-]*").matches(key)) key else "_u" + encode(key)
+        return base + "__" + item
     }
 `;
   const leafType = '\ntype LeafValue<T> = T extends string ? T : { [K in keyof T]: LeafValue<T[K]> }[keyof T];\nexport type ElementId = LeafValue<typeof ElementIds>;\n';

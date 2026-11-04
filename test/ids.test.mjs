@@ -80,14 +80,19 @@ test('native namespace and TypeScript leaf union are generated', () => {
   }
 });
 
-test('withKey preserves opaque keys and rejects unsafe or ambiguous inputs', async () => {
+test('withKey preserves legacy IDs and encodes arbitrary strings without collisions', async () => {
   const { withKey } = await import('shared-element-ids');
   assert.equal(withKey('accountCardView', 'ACC001'), 'accountCardView__ACC001');
   assert.equal(withKey('accountCardView', '001-A_b'), 'accountCardView__001-A_b');
-  for (const key of ['', 1, null, undefined, ' ACC001', 'ACC001 ', 'ACC/001', 'ACC001\n', 'บัญชี']) {
-    assert.throws(() => withKey('accountCardView', key), TypeError);
-  }
-  for (const base of ['', null, 'accountCardView__ACC001', 'accountCardView\n']) {
-    assert.throws(() => withKey(base, 'ACC001'), TypeError);
+  assert.equal(withKey('row', 'a.b'), 'row___u0061002e0062');
+  assert.equal(withKey('', ''), '_b___u');
+  const keys = ['', 'a.b', 'a@b', 'a_b', '_u0061002e0062', 'บัญชี', '😀', 'é', 'e\u0301', 'a\n', 'a\r', ' a', 'a '];
+  assert.equal(new Set(keys.map(key => withKey('row', key))).size, keys.length);
+  const bases = ['', 'row', 'row.name', 'row__x', 'แถว', 'row\n'];
+  const ids = bases.flatMap(base => keys.map(key => withKey(base, key)));
+  assert.equal(new Set(ids).size, bases.length * keys.length);
+  for (const value of [1, null, undefined]) {
+    assert.throws(() => withKey('row', value), TypeError);
+    assert.throws(() => withKey(value, 'key'), TypeError);
   }
 });

@@ -48,9 +48,17 @@ export const ElementIds = Object.freeze({
   }),
 });
 
-/** Compose a stable row ID. Key is a non-sensitive reference, not a list index. */
+/** Compose IDs from non-sensitive strings, preserving valid legacy IDs. */
 export function withKey(baseId, key) {
-  if (typeof baseId !== 'string' || /[\r\n]/.test(baseId) || !/^[a-z][A-Za-z0-9]*$/.test(baseId)) throw new TypeError('Invalid base ID.');
-  if (typeof key !== 'string' || /[\r\n]/.test(key) || !/^[A-Za-z0-9][A-Za-z0-9_-]*$/.test(key)) throw new TypeError('Invalid item key. Use a non-empty ASCII reference.');
-  return baseId + '__' + key;
+  if (typeof baseId !== 'string' || typeof key !== 'string') throw new TypeError('withKey requires strings.');
+  const encode = value => {
+    let result = '';
+    for (let index = 0; index < value.length; index++) {
+      result += value.charCodeAt(index).toString(16).padStart(4, '0');
+    }
+    return result;
+  };
+  const base = /^[a-z][A-Za-z0-9]*$/.test(baseId) && !/[\r\n]/.test(baseId) ? baseId : '_b' + encode(baseId);
+  const item = /^[A-Za-z0-9][A-Za-z0-9_-]*$/.test(key) && !/[\r\n]/.test(key) ? key : '_u' + encode(key);
+  return base + '__' + item;
 }
